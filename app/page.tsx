@@ -10,6 +10,7 @@ import Hero from "@/components/Hero";
 import HowToOrder from "@/components/HowToOrder";
 import MobileOrderBar from "@/components/MobileOrderBar";
 import Products from "@/components/Products";
+import Testimonials from "@/components/Testimonials";
 
 export default function Home() {
   return (
@@ -23,6 +24,7 @@ export default function Home() {
         <About />
         <HowToOrder />
         <Gallery />
+        <Testimonials />
         <Contact />
         <FinalCta />
       </main>

@@ -97,13 +97,40 @@ into `public/images/`, using the same filename that's already there.
 
 ---
 
-## 3. Adding a Google Map
+## 3. Adding customer feedback
 
-We did not guess a map pin for you. When you're ready, open
-**`components/Contact.tsx`** and find the comment marked `GOOGLE MAPS`. It tells
-you exactly what to paste and where.
+Real WhatsApp screenshots from customers appear in the **What Our Customers Say**
+section, listed in **`data/testimonials.ts`**.
 
-## 4. Adding your Instagram / Facebook
+**To add a new one:**
+
+1. Save the screenshot into `source-images/feedback/`.
+2. Open `scripts/prepare-images.mjs`, find `FEEDBACK_JOBS`, and add a line for it
+   (copy the pattern of the ones already there).
+3. Run `npm run images`.
+4. Open `data/testimonials.ts` and add an entry pointing at the file it made —
+   the console output from step 3 tells you the exact width and height to put in.
+
+Nothing is retyped or edited — the screenshots are shown exactly as the customer
+sent them.
+
+## 4. The map and location
+
+The map on the Contact section is a live, interactive map centred on your real
+coordinates — no Google API key needed, so it costs nothing to run. The
+**"Get Directions on Google Maps"** button underneath opens your actual Google
+Maps link, for turn-by-turn directions.
+
+If you ever move, or want to fine-tune the exact map view, open **`data/site.ts`**
+and update `latitude`, `longitude`, `mapUrl` and `mapEmbedUrl` together.
+
+> Why not a Google Maps embed? Google retired the free, key-free way to embed a
+> map a while back — it now requires a billed API key. Rather than ask you to set
+> one up, the site uses OpenStreetMap for the visual (which needs no key and is
+> centred on the same spot), while the button still sends people to Google Maps
+> by name, which is what most people actually open on their phone.
+
+## 5. Adding your Instagram / Facebook
 
 The social icons in the footer are deliberately switched off — we don't have your
 real page addresses, and a link that goes nowhere is worse than none. Open
@@ -112,7 +139,7 @@ the two-line instruction there.
 
 ---
 
-## 5. Putting it online
+## 6. Putting it online
 
 1. Push this folder to GitHub.
 2. Go to [vercel.com](https://vercel.com), choose **Add New → Project**, and pick

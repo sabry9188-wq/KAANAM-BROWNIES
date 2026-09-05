@@ -68,13 +68,20 @@ export default function Footer() {
               Visit &amp; Order
             </h2>
             <ul className="mt-5 space-y-1 text-[0.9375rem]">
-              <li className="flex items-start gap-3 py-2 text-cream-100/70">
-                <MapPin
-                  className="mt-0.5 h-[1.125rem] w-[1.125rem] shrink-0 text-gold-500"
-                  strokeWidth={1.5}
-                  aria-hidden
-                />
-                {site.addressLine}
+              <li>
+                <a
+                  href={site.mapUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-3 py-2 text-cream-100/70 transition-colors hover:text-gold-400"
+                >
+                  <MapPin
+                    className="mt-0.5 h-[1.125rem] w-[1.125rem] shrink-0 text-gold-500"
+                    strokeWidth={1.5}
+                    aria-hidden
+                  />
+                  {site.addressLine}
+                </a>
               </li>
               <li>
                 <a

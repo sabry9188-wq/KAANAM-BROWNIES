@@ -40,8 +40,15 @@ export default function Contact() {
                   <MapPin className="h-5 w-5" strokeWidth={1.5} aria-hidden />
                   <span className="sr-only">Location</span>
                 </dt>
-                <dd className="mt-4 text-[0.9375rem] leading-relaxed text-cream-100/80">
-                  {site.addressLine}
+                <dd className="mt-2">
+                  <a
+                    href={site.mapUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-11 items-center text-[0.9375rem] leading-relaxed text-cream-100/80 underline decoration-gold-500/40 underline-offset-4 transition-colors hover:text-gold-400"
+                  >
+                    {site.addressLine}
+                  </a>
                 </dd>
               </div>
 
@@ -91,16 +98,24 @@ export default function Contact() {
               </OrderButton>
             </div>
 
-            {/*
-              GOOGLE MAPS
-              ------------------------------------------------------------------
-              We have not guessed a map pin for you. When you are ready:
-                1. Find the shop on Google Maps
-                2. Share → Embed a map → Copy HTML
-                3. Paste the <iframe> here, and add
-                   className="mt-10 h-72 w-full rounded-2xl border-0"
-                   loading="lazy"
-            */}
+            <div className="mt-11 overflow-hidden rounded-2xl border border-cocoa-600">
+              <iframe
+                src={site.mapEmbedUrl}
+                title={`Map showing ${site.name}'s location — ${site.addressLine}`}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="h-72 w-full border-0 grayscale-[20%] sm:h-80"
+              />
+              <a
+                href={site.mapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex min-h-12 items-center justify-center gap-2 bg-cocoa-900 text-sm font-medium text-gold-400 transition-colors hover:bg-cocoa-950 hover:text-gold-300"
+              >
+                <MapPin className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                Get Directions on Google Maps
+              </a>
+            </div>
           </div>
         </Reveal>
       </div>

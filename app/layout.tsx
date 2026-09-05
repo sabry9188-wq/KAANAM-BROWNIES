@@ -101,6 +101,12 @@ const structuredData = {
     addressLocality: `${site.addressLocality} - 5`,
     addressCountry: site.addressCountry,
   },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: site.latitude,
+    longitude: site.longitude,
+  },
+  hasMap: site.mapUrl,
   makesOffer: products.map((product) => ({
     "@type": "Offer",
     itemOffered: {

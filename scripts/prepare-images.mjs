@@ -25,6 +25,8 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = path.join(ROOT, "source-images");
 const OUT = path.join(ROOT, "public", "images");
 const APP = path.join(ROOT, "app");
+const FEEDBACK_SRC = path.join(SRC, "feedback");
+const FEEDBACK_OUT = path.join(OUT, "feedback");
 
 /** Standard sizes used across the site. */
 const CARD = { width: 900, height: 1125 }; // 4:5 portrait — product cards
@@ -70,7 +72,7 @@ const JOBS = [
 ];
 
 /**
- * Crops taken from the poster (source-images/poster.jpg, 1280x853).
+ * Crop taken from the poster (source-images/poster.jpg, 1280x853).
  * `extract` is an exact pixel box: { left, top, width, height }.
  *
  * NOTE: brookies.webp is cut from a small area of the poster, so it is softer
@@ -85,41 +87,70 @@ const POSTER_JOBS = [
     ...CARD,
     sharpen: true,
   },
-  // Full gold lockup: crest + KAANAM + BROWNIES. The site typesets its own
-  // wordmark, so this one is for you — a WhatsApp Business or social avatar.
+];
+
+/**
+ * Crops taken from the dedicated logo badge (source-images/logo-badge.jpg,
+ * 1302x1208) — the crescent-and-brownie-stack emblem, sharper and higher
+ * resolution than anything cut from the poster.
+ */
+const LOGO_JOBS = [
+  // Full badge: crest + KAANAM BROWNIES + address. Used in the footer, and
+  // handy on its own for a WhatsApp Business or social profile picture.
   {
     to: "logo.png",
-    extract: { left: 50, top: 6, width: 320, height: 212 },
-    width: 640,
+    extract: { left: 40, top: 20, width: 1220, height: 1170 },
+    width: 900,
     format: "png",
   },
-  // Crest only (crescent + brownie stack). Used in the header and as the favicon.
+  // Crest only (crescent + brownie stack). Used in the header and the favicon.
   {
     to: "logo-mark.png",
-    extract: { left: 136, top: 12, width: 120, height: 118 },
-    width: 480,
+    extract: { left: 430, top: 30, width: 440, height: 440 },
+    width: 512,
     format: "png",
   },
 ];
 
-/** Pixel box on the poster for the crest, reused by the favicon builder. */
-const CREST = { left: 136, top: 12, width: 120, height: 118 };
+/** Pixel box on the logo badge for the crest, reused by the favicon builder. */
+const CREST = { left: 430, top: 30, width: 440, height: 440 };
+
+/**
+ * Real WhatsApp screenshots from customers. These are NOT cropped to a fixed
+ * shape like the product photos — a testimonial has to keep its full text, so
+ * every one just gets scaled down to a sensible width and left at its own
+ * natural height. See data/testimonials.ts for where they are displayed.
+ *
+ * TO ADD A NEW ONE: save the screenshot into source-images/feedback/, add a
+ * line below pointing at it, then add a matching entry to
+ * data/testimonials.ts.
+ */
+const FEEDBACK_WIDTH = 760; // wide enough to stay sharp at ~380px on a retina phone
+
+const FEEDBACK_JOBS = [
+  { from: "feedback-amazing-fudgy.jpg", to: "feedback-amazing-fudgy.webp", width: FEEDBACK_WIDTH },
+  { from: "feedback-so-fudgy.jpg", to: "feedback-so-fudgy.webp", width: FEEDBACK_WIDTH },
+  { from: "feedback-awesome-taste.jpg", to: "feedback-awesome-taste.webp", width: FEEDBACK_WIDTH },
+  { from: "feedback-delicious-sis.jpg", to: "feedback-delicious-sis.webp", width: FEEDBACK_WIDTH },
+  { from: "feedback-delicious-expected.jpg", to: "feedback-delicious-expected.webp", width: FEEDBACK_WIDTH },
+];
 
 async function ensureDirs() {
   await mkdir(OUT, { recursive: true });
+  await mkdir(FEEDBACK_OUT, { recursive: true });
 }
 
-/** Finds a source file by name, ignoring the extension so any format works. */
-async function findSource(name, listing) {
-  const direct = path.join(SRC, name);
+/** Finds a source file by name inside `dir`, ignoring the extension. */
+async function findSource(dir, name, listing) {
+  const direct = path.join(dir, name);
   if (existsSync(direct)) return direct;
   const base = name.replace(/\.[^.]+$/, "").toLowerCase();
   const match = listing.find((f) => f.replace(/\.[^.]+$/, "").toLowerCase() === base);
-  return match ? path.join(SRC, match) : null;
+  return match ? path.join(dir, match) : null;
 }
 
-async function runJob(job, listing) {
-  const source = await findSource(job.from, listing);
+async function runJob(job, listing, { dir = SRC, outDir = OUT, noCrop = false } = {}) {
+  const source = await findSource(dir, job.from, listing);
   if (!source) {
     console.warn(`  skip   ${job.to.padEnd(30)} (missing source: ${job.from})`);
     return false;
@@ -127,15 +158,19 @@ async function runJob(job, listing) {
 
   let pipe = sharp(source, { failOn: "none" }).rotate();
 
-  pipe = pipe.resize({
-    width: job.width,
-    height: job.height,
-    fit: "cover",
-    position: job.position ?? "centre",
-    withoutEnlargement: false,
-  });
+  // Testimonial screenshots: scale the width down, keep every pixel of the
+  // conversation — no fixed aspect ratio to crop to.
+  pipe = noCrop
+    ? pipe.resize({ width: job.width, withoutEnlargement: true })
+    : pipe.resize({
+        width: job.width,
+        height: job.height,
+        fit: "cover",
+        position: job.position ?? "centre",
+        withoutEnlargement: false,
+      });
 
-  const target = path.join(OUT, job.to);
+  const target = path.join(outDir, job.to);
   if (job.format === "jpeg") {
     pipe = pipe.jpeg({ quality: job.quality ?? 82, mozjpeg: true });
   } else {
@@ -147,8 +182,9 @@ async function runJob(job, listing) {
   return true;
 }
 
-async function runPosterJob(job, posterPath) {
-  let pipe = sharp(posterPath).extract(job.extract);
+/** Runs an exact pixel-box crop (used for the poster and the logo badge). */
+async function runCropJob(job, sourcePath) {
+  let pipe = sharp(sourcePath).extract(job.extract);
 
   if (job.width) {
     pipe = pipe.resize({
@@ -172,8 +208,8 @@ async function runPosterJob(job, posterPath) {
 }
 
 /** Favicons: Next.js serves app/icon.png and app/apple-icon.png automatically. */
-async function buildIcons(posterPath) {
-  const mark = sharp(posterPath).extract(CREST);
+async function buildIcons(logoBadgePath) {
+  const mark = sharp(logoBadgePath).extract(CREST);
 
   const bg = { r: 20, g: 9, b: 6, alpha: 1 };
 
@@ -207,21 +243,46 @@ async function main() {
     if (await runJob(job, listing)) written += 1;
   }
 
-  const posterPath = await findSource("poster.jpg", listing);
+  const posterPath = await findSource(SRC, "poster.jpg", listing);
   if (posterPath) {
     for (const job of POSTER_JOBS) {
       // Don't overwrite a real photo the owner has supplied.
-      const supplied = await findSource(job.to.replace(/\.webp$/, ".jpg"), listing);
+      const supplied = await findSource(SRC, job.to.replace(/\.webp$/, ".jpg"), listing);
       if (job.to === "brookies.webp" && supplied) {
         await runJob({ from: path.basename(supplied), to: job.to, ...CARD, position: ATTENTION }, listing);
         continue;
       }
-      await runPosterJob(job, posterPath);
+      await runCropJob(job, posterPath);
       written += 1;
     }
-    await buildIcons(posterPath);
   } else {
     console.warn("  skip   poster crops (source-images/poster.jpg not found)");
+  }
+
+  const logoBadgePath = await findSource(SRC, "logo-badge.jpg", listing);
+  if (logoBadgePath) {
+    for (const job of LOGO_JOBS) {
+      await runCropJob(job, logoBadgePath);
+      written += 1;
+    }
+    await buildIcons(logoBadgePath);
+  } else {
+    console.warn("  skip   logo crops (source-images/logo-badge.jpg not found)");
+  }
+
+  console.log("\nCustomer feedback screenshots\n");
+  if (existsSync(FEEDBACK_SRC)) {
+    const feedbackListing = await readdir(FEEDBACK_SRC);
+    for (const job of FEEDBACK_JOBS) {
+      const ok = await runJob(job, feedbackListing, {
+        dir: FEEDBACK_SRC,
+        outDir: FEEDBACK_OUT,
+        noCrop: true,
+      });
+      if (ok) written += 1;
+    }
+  } else {
+    console.warn("  skip   feedback screenshots (source-images/feedback/ not found)");
   }
 
   console.log(`\nDone — ${written} images written to public/images/\n`);
