@@ -1,36 +1,162 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kaanam Brownies — website
 
-## Getting Started
+_Rich. Fudgy. Irresistible._
 
-First, run the development server:
+A single-page website for Kaanam Brownies. Every order button opens WhatsApp with
+the message already written. There is no database, no login and no admin panel —
+you edit two files and the whole site updates.
+
+---
+
+## Running it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install      # once
+npm run dev      # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Start the site while you work on it |
+| `npm run build` | Make the production build |
+| `npm run start` | Serve the production build |
+| `npm run images` | Rebuild the optimised photos from `source-images/` |
+| `npm run lint` | Check the code |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 1. Changing prices, names and descriptions
 
-## Learn More
+Everything on the menu lives in **`data/products.ts`** — one block per product:
 
-To learn more about Next.js, take a look at the following resources:
+```ts
+{
+  slug: "fudge-brownie",
+  name: "Fudge Brownie",
+  description: "Rich, moist & fudgy chocolate brownie.",
+  quantity: "6 pieces",
+  priceLabel: "Rs. 800",     // what customers see
+  priceValue: 800,           // the same number, for Google listings
+  image: "/images/fudge-brownie.webp",
+  alt: "Three fudge brownies stacked on a dark plate…",
+}
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Change it here and it updates the menu card, the WhatsApp order message and the
+Google listing data all at once. **Keep `priceLabel` and `priceValue` in step.**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Phone number, address and tagline live in **`data/site.ts`**.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 2. Putting in your own photos ← read this one
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Your original photographs are in **`source-images/`**. They are untouched; the
+website uses smaller, faster copies in `public/images/`.
+
+**To swap a photo:**
+
+1. Put your new picture in `source-images/`, named exactly as in the table below
+   (any format — `.jpg`, `.png`, `.webp`, `.heic` — the extension doesn't matter).
+2. Run `npm run images`.
+
+That's it. The site picks it up automatically.
+
+| Put your photo here | Where it appears |
+| --- | --- |
+| `source-images/brownie cookies 1.jpg` | Brownie Cookies menu card |
+| `source-images/nuts brownie 1.jpg` | Nuts Brownie menu card |
+| `source-images/fudge brownie 1.jpg` | Fudge Brownie menu card |
+| `source-images/blondie 1.jpg` | Blondie menu card |
+| `source-images/chocolate overload 1.jpg` | Chocolate Overload menu card |
+| `source-images/brookies.jpg` | **Brookies menu card** — see the note below |
+| `source-images/fudge brownie 2.jpg` | Big hero picture at the top |
+| `source-images/chocolate overload 2.jpg` | "Made for Serious Chocolate Cravings" |
+| `source-images/brownie drizzle.jpg` | "Baked With Love" story picture |
+| `source-images/nuts brownie 2.jpg` | Gallery — wide tile |
+| `source-images/brownie cookies 2.jpg` | Gallery |
+| `source-images/blondie 2.jpg` | Gallery |
+| `source-images/brownie tray.jpg` | Gallery — wide tile |
+| `source-images/poster.jpg` | Your logo and the Brookies picture are cut from this |
+
+> ### ⚠️ Replace the Brookies photo first
+>
+> Brookies is the one product you had no photograph of, so its picture is cut
+> out of your poster. It works, but it is lower resolution than the others.
+>
+> When you have a real photo, save it as **`source-images/brookies.jpg`** and run
+> `npm run images`. The script will notice it and use your photo instead of the
+> poster crop — no code changes needed.
+
+**Photo tips:** for menu cards use an upright (portrait) photo. For the two wide
+gallery tiles and the hero, use a landscape photo — a tall photo squeezed into a
+wide space loses most of the food.
+
+**In a hurry?** You can skip all of the above and drop a finished picture straight
+into `public/images/`, using the same filename that's already there.
+
+---
+
+## 3. Adding a Google Map
+
+We did not guess a map pin for you. When you're ready, open
+**`components/Contact.tsx`** and find the comment marked `GOOGLE MAPS`. It tells
+you exactly what to paste and where.
+
+## 4. Adding your Instagram / Facebook
+
+The social icons in the footer are deliberately switched off — we don't have your
+real page addresses, and a link that goes nowhere is worse than none. Open
+**`components/Footer.tsx`**, find the comment marked `SOCIAL LINKS`, and follow
+the two-line instruction there.
+
+---
+
+## 5. Putting it online
+
+1. Push this folder to GitHub.
+2. Go to [vercel.com](https://vercel.com), choose **Add New → Project**, and pick
+   the repository. Vercel detects Next.js on its own — just press Deploy.
+3. Once it's live, open **`data/site.ts`** and set `url` to your real address.
+   That's what makes the nice preview card appear when someone shares your link
+   on WhatsApp or Facebook.
+
+---
+
+## About the WhatsApp links
+
+Your number is `075 619 8015`. WhatsApp links need the international form with no
+plus sign and no leading zero, so the site uses **`94756198015`** (`+94` for Sri
+Lanka). A link built as `wa.me/0756198015` would **not** reach you.
+
+This is handled for you in `lib/whatsapp.ts` — if you ever change the number,
+change it there and everywhere on the site updates. The tap-to-call button uses
+the local form `tel:0756198015`, exactly as printed on your poster.
+
+---
+
+## Where things are
+
+```
+app/          layout, page, styles, favicon
+components/   one file per section of the page
+data/         products.ts, site.ts, gallery.ts  ← what you'll edit
+lib/          whatsapp.ts — how order links are built
+public/images/ the optimised pictures the site serves
+source-images/ your full-size originals
+scripts/      prepare-images.mjs and the checking tools
+```
+
+### The checking tools
+
+Used while building the site; keep them for later changes. Start the site first
+(`npm run dev`), then in another terminal:
+
+```bash
+node scripts/audit.mjs http://localhost:3000        # broken images, links, tap sizes
+node scripts/check-links.mjs http://localhost:3000  # prints every WhatsApp message
+node scripts/shoot.mjs http://localhost:3000        # screenshots at phone/tablet/desktop
+```
+
+They use the copy of Chrome already on your computer and write screenshots to
+`.screens/`. They are development helpers only — nothing in them ships to visitors.
