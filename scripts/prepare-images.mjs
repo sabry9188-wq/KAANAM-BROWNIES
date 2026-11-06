@@ -51,6 +51,7 @@ const JOBS = [
   { from: "fudge brownie 1.jpg", to: "fudge-brownie.webp", ...CARD, position: ATTENTION },
   { from: "blondie 1.jpg", to: "blondie.webp", ...CARD, position: ATTENTION },
   { from: "chocolate overload 1.jpg", to: "chocolate-overload.webp", ...CARD, position: ATTENTION },
+  { from: "choco blast 1.jpg", to: "choco-blast.webp", ...CARD, position: ATTENTION },
 
   // ---- Hero / featured / about --------------------------------------------
   { from: "fudge brownie 2.jpg", to: "hero.webp", ...WIDE, position: ATTENTION, quality: 78 },

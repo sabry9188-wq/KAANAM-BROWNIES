@@ -120,7 +120,8 @@ const structuredData = {
     eligibleQuantity: {
       "@type": "QuantitativeValue",
       value: parseInt(product.quantity, 10),
-      unitText: "pieces",
+      // "6 pieces" → "pieces", "360g" → "g"
+      unitText: product.quantity.replace(/^[\d\s]+/, "") || "pieces",
     },
   })),
 };

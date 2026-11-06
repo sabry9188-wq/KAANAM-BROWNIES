@@ -86,4 +86,15 @@ export const products: Product[] = [
     image: "/images/brookies.webp",
     alt: "Stacked brookies showing a fudgy brownie base under a golden chocolate chip cookie layer",
   },
+  {
+    slug: "choco-blast",
+    name: "Kaanam Choco Blast",
+    description:
+      "Rich chocolate-coated brownie bites loaded with chocolate chips. Every bite is a chocolate explosion! One bowl, endless chocolate happiness.",
+    quantity: "360g",
+    priceLabel: "Rs. 1,400",
+    priceValue: 1400,
+    image: "/images/choco-blast.webp",
+    alt: "A kraft bowl of chocolate-coated brownie bites topped with dark and white chocolate chips, beside a lidded Kaanam Brownies tub",
+  },
 ];
