@@ -93,7 +93,7 @@ const structuredData = {
   url: site.url,
   image: `${site.url}/images/og-image.jpg`,
   telephone: site.phoneIntl,
-  priceRange: "Rs. 800 – Rs. 1,500",
+  priceRange: "Rs. 800 – Rs. 4,300",
   servesCuisine: "Desserts",
   address: {
     "@type": "PostalAddress",

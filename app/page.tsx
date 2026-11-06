@@ -1,4 +1,5 @@
 import About from "@/components/About";
+import CelebrationCakes from "@/components/CelebrationCakes";
 import Contact from "@/components/Contact";
 import Features from "@/components/Features";
 import FeaturedProduct from "@/components/FeaturedProduct";
@@ -21,6 +22,7 @@ export default function Home() {
         <Features />
         <Products />
         <FeaturedProduct />
+        <CelebrationCakes />
         <About />
         <HowToOrder />
         <Gallery />

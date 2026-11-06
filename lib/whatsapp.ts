@@ -28,6 +28,17 @@ export function productOrderUrl(product: Product): string {
   );
 }
 
+/** Message for ordering a custom celebration cake in a given style. */
+export function cakeOrderUrl(styleName?: string): string {
+  return whatsappUrl(
+    `Hi ${site.name}! I would like to order a celebration cake` +
+      (styleName ? ` (${styleName})` : "") +
+      `.\n\n` +
+      `Occasion: \nDate needed: \nSize / servings: \nName or message on the cake: \n\n` +
+      `Please let me know the price and availability.`,
+  );
+}
+
 /** The message used by every general "Order on WhatsApp" button. */
 export const generalOrderUrl = whatsappUrl(
   `Hi ${site.name}! I would like to place an order.\n\n` +

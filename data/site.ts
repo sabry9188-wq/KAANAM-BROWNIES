@@ -68,6 +68,7 @@ export const brandValues = [
 export const navLinks = [
   { label: "Home", href: "#home" },
   { label: "Menu", href: "#menu" },
+  { label: "Cakes", href: "#cakes" },
   { label: "About", href: "#about" },
   { label: "Gallery", href: "#gallery" },
   { label: "Contact", href: "#contact" },

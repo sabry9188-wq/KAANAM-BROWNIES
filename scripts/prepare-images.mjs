@@ -52,6 +52,8 @@ const JOBS = [
   { from: "blondie 1.jpg", to: "blondie.webp", ...CARD, position: ATTENTION },
   { from: "chocolate overload 1.jpg", to: "chocolate-overload.webp", ...CARD, position: ATTENTION },
   { from: "choco blast 1.jpg", to: "choco-blast.webp", ...CARD, position: ATTENTION },
+  // Landscape photo: "west" keeps the two left slices whole.
+  { from: "mango cheesecake 1.jpg", to: "mango-cheesecake.webp", ...CARD, position: "west" },
 
   // ---- Hero / featured / about --------------------------------------------
   { from: "fudge brownie 2.jpg", to: "hero.webp", ...WIDE, position: ATTENTION, quality: 78 },
@@ -136,9 +138,48 @@ const FEEDBACK_JOBS = [
   { from: "feedback-delicious-expected.jpg", to: "feedback-delicious-expected.webp", width: FEEDBACK_WIDTH },
 ];
 
+/**
+ * Celebration cakes (birthday / anniversary / bride-to-be). Every file in
+ * source-images/cakes/ becomes public/images/cakes/<same-name>.webp — no list
+ * to maintain here. Then add the photo to data/cakes.ts to show it.
+ *
+ * The lettering and toppings are the whole point of these photos, so they
+ * are never cropped hard: a photo already close to the 4:5 card shape is
+ * trimmed slightly, anything wider or squarer is fitted whole onto a blurred,
+ * darkened copy of itself.
+ */
+const CAKES_SRC = path.join(SRC, "cakes");
+const CAKES_OUT = path.join(OUT, "cakes");
+
+async function runCakeJob(file) {
+  const source = path.join(CAKES_SRC, file);
+  const to = file.replace(/\.[^.]+$/, ".webp");
+  const { width: W, height: H } = CARD;
+  const meta = await sharp(source).rotate().metadata();
+  const ratio = (meta.autoOrient?.width ?? meta.width) / (meta.autoOrient?.height ?? meta.height);
+
+  let pipe;
+  if (ratio >= 0.7 && ratio <= 0.9) {
+    pipe = sharp(source).rotate().resize({ width: W, height: H, fit: "cover", position: "centre" });
+  } else {
+    const backdrop = await sharp(source)
+      .rotate()
+      .resize({ width: W, height: H, fit: "cover" })
+      .blur(40)
+      .modulate({ brightness: 0.55 })
+      .toBuffer();
+    const front = await sharp(source).rotate().resize({ width: W, height: H, fit: "inside" }).toBuffer();
+    pipe = sharp(backdrop).composite([{ input: front, gravity: "centre" }]);
+  }
+
+  const info = await pipe.webp({ quality: 80, effort: 5 }).toFile(path.join(CAKES_OUT, to));
+  console.log(`  write  cakes/${to.padEnd(24)} ${info.width}x${info.height}  ${(info.size / 1024).toFixed(0)} KB`);
+}
+
 async function ensureDirs() {
   await mkdir(OUT, { recursive: true });
   await mkdir(FEEDBACK_OUT, { recursive: true });
+  await mkdir(CAKES_OUT, { recursive: true });
 }
 
 /** Finds a source file by name inside `dir`, ignoring the extension. */
@@ -284,6 +325,16 @@ async function main() {
     }
   } else {
     console.warn("  skip   feedback screenshots (source-images/feedback/ not found)");
+  }
+
+  console.log("\nCelebration cakes\n");
+  if (existsSync(CAKES_SRC)) {
+    for (const file of (await readdir(CAKES_SRC)).filter((f) => /\.(jpe?g|png|webp|heic)$/i.test(f))) {
+      await runCakeJob(file);
+      written += 1;
+    }
+  } else {
+    console.warn("  skip   cakes (source-images/cakes/ not found)");
   }
 
   console.log(`\nDone — ${written} images written to public/images/\n`);
