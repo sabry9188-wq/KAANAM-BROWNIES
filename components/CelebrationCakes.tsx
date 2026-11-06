@@ -1,23 +1,12 @@
-"use client";
-
 import Image from "next/image";
-import { useState } from "react";
 
-import { cakePhotos, cakeStyles, occasions, type Occasion } from "@/data/cakes";
+import { cakePhotos, cakeStyles, occasions } from "@/data/cakes";
 import { cakeOrderUrl } from "@/lib/whatsapp";
 import OrderButton from "./OrderButton";
 import Reveal from "./Reveal";
 import WhatsAppIcon from "./WhatsAppIcon";
 
-type Filter = Occasion | "all";
-
 export default function CelebrationCakes() {
-  const [filter, setFilter] = useState<Filter>("all");
-  const shown =
-    filter === "all" ? cakePhotos : cakePhotos.filter((p) => p.occasions.includes(filter));
-
-  const tabs: { id: Filter; label: string }[] = [{ id: "all", label: "All" }, ...occasions];
-
   return (
     <section id="cakes" aria-labelledby="cakes-heading" className="bg-cream-100 py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
@@ -54,61 +43,51 @@ export default function CelebrationCakes() {
           ))}
         </div>
 
-        {/* Occasion filter */}
-        <div
-          role="group"
-          aria-label="Filter cakes by occasion"
-          className="mt-12 flex flex-wrap justify-center gap-2"
-        >
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setFilter(tab.id)}
-              aria-pressed={filter === tab.id}
-              className={`min-h-11 rounded-full border px-5 text-sm font-medium transition-colors ${
-                filter === tab.id
-                  ? "border-cocoa-900 bg-cocoa-900 text-gold-300"
-                  : "border-cream-200 bg-white text-ink-700 hover:border-gold-500 hover:text-cocoa-900"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        <ul className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
-          {shown.map((photo) => {
-            const style = cakeStyles[photo.style];
-            return (
-              <li key={photo.src}>
-                <a
-                  href={cakeOrderUrl(style.name)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`Order a ${style.name} like this on WhatsApp`}
-                  className="group relative block aspect-4/5 overflow-hidden rounded-2xl bg-cocoa-900 shadow-[var(--shadow-card)]"
-                >
-                  <Image
-                    src={photo.src}
-                    alt={photo.alt}
-                    fill
-                    sizes="(min-width: 1024px) 25vw, 50vw"
-                    className="img-zoom object-cover"
-                  />
-                  <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-cocoa-950/90 via-cocoa-950/50 to-transparent p-3 pt-10 sm:p-4 sm:pt-12">
-                    <span className="block text-xs font-medium text-cream-50 sm:text-sm">
-                      {style.name}
-                    </span>
-                    <span className="mt-0.5 block text-[0.6875rem] text-gold-300 sm:text-xs">
-                      Tap to order this style
-                    </span>
-                  </span>
-                </a>
-              </li>
-            );
-          })}
-        </ul>
+        {/* One block per occasion, each with its own heading */}
+        {occasions.map((occasion) => {
+          const photos = cakePhotos.filter((p) => p.occasions.includes(occasion.id));
+          if (photos.length === 0) return null;
+          return (
+            <div key={occasion.id} className="mt-14">
+              <h3 className="flex items-center gap-4 font-display text-2xl text-cocoa-900 sm:text-3xl">
+                {occasion.label} Cakes
+                <span className="h-px flex-1 bg-gold-500/40" aria-hidden />
+              </h3>
+              <ul className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+                {photos.map((photo) => {
+                  const style = cakeStyles[photo.style];
+                  return (
+                    <li key={photo.src}>
+                      <a
+                        href={cakeOrderUrl(style.name)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Order a ${style.name} like this on WhatsApp`}
+                        className="group relative block aspect-4/5 overflow-hidden rounded-2xl bg-cocoa-900 shadow-[var(--shadow-card)]"
+                      >
+                        <Image
+                          src={photo.src}
+                          alt={photo.alt}
+                          fill
+                          sizes="(min-width: 1024px) 25vw, 50vw"
+                          className="img-zoom object-cover"
+                        />
+                        <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-cocoa-950/90 via-cocoa-950/50 to-transparent p-3 pt-10 sm:p-4 sm:pt-12">
+                          <span className="block text-xs font-medium text-cream-50 sm:text-sm">
+                            {style.name}
+                          </span>
+                          <span className="mt-0.5 block text-[0.6875rem] text-gold-300 sm:text-xs">
+                            Tap to order this style
+                          </span>
+                        </span>
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        })}
 
         <Reveal className="mt-12 flex flex-col items-center gap-4 text-center">
           <p className="max-w-xl text-sm text-ink-500">

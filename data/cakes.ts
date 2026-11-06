@@ -77,7 +77,7 @@ export const cakePhotos: CakePhoto[] = [
     src: "/images/cakes/calendar-october.webp",
     alt: "Brownie cake cut into squares piped as an October calendar, with the 24th highlighted in white chocolate and HBD below",
     style: "calendar",
-    occasions: ["birthday", "anniversary"],
+    occasions: ["birthday"],
   },
   {
     src: "/images/cakes/birthday-white-chip-border.webp",
@@ -101,7 +101,7 @@ export const cakePhotos: CakePhoto[] = [
     src: "/images/cakes/calendar-november.webp",
     alt: "Brownie cake piped as a November calendar with the 1st marked in white chocolate and HBD letters along the bottom",
     style: "calendar",
-    occasions: ["birthday", "anniversary"],
+    occasions: ["birthday"],
   },
   {
     src: "/images/cakes/birthday-milk-chocolate-nuts.webp",
