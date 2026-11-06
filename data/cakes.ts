@@ -68,7 +68,7 @@ export const cakePhotos: CakePhoto[] = [
     occasions: ["anniversary"],
   },
   {
-    src: "/images/cakes/bride-to-be-layered.webp",
+    src: "/images/cakes/bridal-layered.webp",
     alt: "Two-layer brownie cake with dripping chocolate, pink hearts and a silver Bride to Be topper",
     style: "layered",
     occasions: ["bridal"],
@@ -98,7 +98,7 @@ export const cakePhotos: CakePhoto[] = [
     occasions: ["birthday"],
   },
   {
-    src: "/images/cakes/calendar-november.webp",
+    src: "/images/cakes/calendar-nov.webp",
     alt: "Brownie cake piped as a November calendar with the 1st marked in white chocolate and HBD letters along the bottom",
     style: "calendar",
     occasions: ["birthday"],
